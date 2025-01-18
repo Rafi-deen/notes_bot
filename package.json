@@ -13,6 +13,7 @@
     "date-fns": "^2.x.x",
     "dotenv": "^16.x.x",
     "express": "^4.x.x",
+    "nodemon": "^3.1.9",
     "telegraf": "^4.x.x"
   },
   "devDependencies": {
