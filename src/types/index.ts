@@ -1,6 +1,13 @@
 import { Context as TelegrafContext } from 'telegraf';
 import { Message, Update } from 'telegraf/types';
 
+export interface Context extends TelegrafContext {
+  message: Update.New & {
+    text?: string;
+  };
+  session: SessionData;
+}
+
 export interface Note {
   id: number;
   user_id: string;
@@ -14,6 +21,10 @@ export interface Note {
 export interface SessionData {
   currentPage: number;
   searchType?: 'tags' | 'content';
+  searchQuery?: string;
+  searchResults?: Note[];
+  lastSearchType?: 'tags' | 'content';
+  lastSearchQuery?: string;
   noteData?: {
     title?: string;
     content?: string;
@@ -21,7 +32,20 @@ export interface SessionData {
   };
 }
 
-// Create a custom context type that extends TelegrafContext
-export interface Context extends TelegrafContext {
-  session: SessionData;
+export interface BotConfig {
+  botToken: string;
+  supabase: {
+    url: string;
+    key: string;
+  };
+  webhook: {
+    url: string;
+    port: number;
+  };
+  defaultSettings: {
+    notesPerPage: number;
+    maxTitleLength: number;
+    maxContentLength: number;
+    maxTags: number;
+  };
 }

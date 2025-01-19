@@ -11,7 +11,15 @@ export const keyboards = {
   search: () => 
     Markup.keyboard([
       ['🏷️ Search by Tags', '📝 Search by Content'],
+      ['🔄 Refine Search'],
       ['⬅️ Back to Main Menu']
+    ]).resize(),
+
+  searchResults: () => 
+    Markup.keyboard([
+      ['📅 Sort by Date', '📊 Sort by Relevance'],
+      ['🔄 Refine Search'],
+      ['🔍 New Search', '⬅️ Back to Main Menu']
     ]).resize(),
 
   listNavigation: (currentPage: number, totalPages: number) => 
@@ -22,7 +30,7 @@ export const keyboards = {
 
   settings: () => 
     Markup.keyboard([
-      ['📊 Notes per page', '🕒 Time format', '🌐 Language'],
+      ['📊 Notes per page', '🕒 Time format'],
       ['⬅️ Back to Main Menu']
     ]).resize(),
 
@@ -30,6 +38,18 @@ export const keyboards = {
     Markup.keyboard([
       ['⬅️ Back to Main Menu']
     ]).resize(),
+
+  noteActions: (noteId: number) => 
+    Markup.inlineKeyboard([
+      [
+        Markup.button.callback('📌 Pin/Unpin', `pin_${noteId}`),
+        Markup.button.callback('🗑️ Delete', `delete_${noteId}`)
+      ],
+      [
+        Markup.button.callback('✏️ Edit', `edit_${noteId}`),
+        Markup.button.callback('❌ Close', `close`)
+      ]
+    ]),
 
   remove: () => Markup.removeKeyboard(),
 } as const;

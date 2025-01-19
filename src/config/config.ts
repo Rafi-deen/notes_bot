@@ -1,18 +1,40 @@
-import 'dotenv/config';
-
-export const config = {
-  botToken: process.env.BOT_TOKEN!,
+export interface BotConfig {
+  botToken: string;
   supabase: {
-    url: process.env.SUPABASE_URL!,
-    key: process.env.SUPABASE_API_KEY!,
-  },
+    url: string;
+    key: string;
+  };
   webhook: {
-    url: process.env.WEBHOOK_URL!,
-    port: parseInt(process.env.PORT || '80'),
-  },
+    url: string;
+    port: number;
+  };
+  defaultSettings: {
+    notesPerPage: number;
+    maxTitleLength: number;
+    maxContentLength: number;
+    maxTags: number;
+    timeFormat: string;
+    language: string;
+  };
+}
+
+export const config: BotConfig = {
+  // ... other config
   defaultSettings: {
     notesPerPage: 5,
-    timeFormat: 'DD/MM/YYYY',
-    language: 'en',
+    maxTitleLength: 100,
+    maxContentLength: 4000,
+    maxTags: 10,
+    timeFormat: "DD/MM/YYYY",
+    language: "en"
   },
-} as const;
+  botToken: "",
+  supabase: {
+    url: "",
+    key: ""
+  },
+  webhook: {
+    url: "",
+    port: 0
+  }
+};
