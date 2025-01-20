@@ -5,7 +5,7 @@ export const keyboards = {
     Markup.keyboard([
       ['📝 New Note', '📋 List Notes'],
       ['🔍 Search Notes', '❔ Help'],
-      ['⚙️ Settings']
+      // ['⚙️ Settings']
     ]).resize(),
 
   search: () => 
@@ -20,11 +20,11 @@ export const keyboards = {
       ['⬅️ Back to Main Menu']
     ]).resize(),
 
-  settings: () => 
-    Markup.keyboard([
-      ['📊 Notes per page', '🕒 Time format', '🌐 Language'],
-      ['⬅️ Back to Main Menu']
-    ]).resize(),
+  // settings: () => 
+  //   Markup.keyboard([
+  //     ['📊 Notes per page', '🕒 Time format', '🌐 Language'],
+  //     ['⬅️ Back to Main Menu']
+  //   ]).resize(),
 
   backOnly: () => 
     Markup.keyboard([
