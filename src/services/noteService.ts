@@ -1,5 +1,6 @@
 import { supabase } from "@/database/superbase.js"
 import { Note } from "../types/index.js"
+import { logger } from "@/utils/logger.js"
 
 export const noteService = {
   async saveNote(
@@ -8,6 +9,7 @@ export const noteService = {
     title: string | null = null,
     tags: string[] = []
   ): Promise<Note> {
+    const lowercaseTags = tags.map(tag => tag.toLowerCase());
     const { data, error } = await supabase
       .from("notes")
       .insert([
@@ -15,14 +17,16 @@ export const noteService = {
           user_id: userId.toString(),
           content,
           title,
-          tags,
+          lowercaseTags,
           created_at: new Date().toISOString(),
         },
       ])
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      logger.error(error)
+    }
     return data
   },
 
@@ -51,7 +55,11 @@ export const noteService = {
       .eq("id", noteId)
       .eq("user_id", userId.toString())
 
-    if (error) throw error
+    if (error) {
+      logger.error(error);
+    }
+
+    logger.info(`note ${noteId} deleted successfully`)
   },
 
   async togglePinNote(userId: number, noteId: number): Promise<Note> {
@@ -63,7 +71,9 @@ export const noteService = {
       .single()
 
     if (fetchError) throw fetchError
-    if (!note) throw new Error("Note not found")
+    if (!note) {
+      logger.error("Note not found")
+    }
 
     const { data, error } = await supabase
       .from("notes")
@@ -73,32 +83,36 @@ export const noteService = {
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      logger.error(error)
+    }
     return data
   },
 
-  async searchNotes(
-    userId: number,
-    searchType: "tags" | "content",
-    searchTerm: string
-  ): Promise<Note[]> {
-    let query = supabase
-      .from("notes")
-      .select("*")
-      .eq("user_id", userId.toString())
+  // async searchNotes(
+  //   userId: number,
+  //   searchType: "tags" | "content",
+  //   searchTerm: string
+  // ): Promise<Note[]> {
+  //   let query = supabase
+  //     .from("notes")
+  //     .select("*")
+  //     .eq("user_id", userId.toString())
 
-    if (searchType === "tags") {
-      const tags = searchTerm.split(" ").map((tag) => tag.replace("#", ""))
-      query = query.contains("tags", tags)
-    } else {
-      query = query.ilike("content", `%${searchTerm}%`)
-    }
+  //   if (searchType === "tags") {
+  //     const tags = searchTerm.split(" ").map((tag) => tag.replace("#", "").toLowerCase())
+  //     query = query.contains("tags", tags)
+  //   } else {
+  //     query = query.ilike("content", `%${searchTerm}%`)
+  //   }
 
-    const { data, error } = await query
-    if (error) throw error
-    return data || []
-  },
-  
+  //   const { data, error } = await query
+  //   if (error) {
+  //     logger.error(error)
+  //   }
+  //   return data || []
+  // },
+
   async searchByTags(userId: number, tags: string[]): Promise<Note[]> {
     const { data, error } = await supabase
       .from("notes")
@@ -107,8 +121,7 @@ export const noteService = {
       .contains("tags", tags)
 
     if (error) {
-      console.error("Error searching notes by tags:", error)
-      throw error
+      logger.error("Error searching notes by tags: ", error)
     }
 
     return data || []
@@ -122,8 +135,7 @@ export const noteService = {
       .or(`title.ilike.%${searchText}%,content.ilike.%${searchText}%`)
 
     if (error) {
-      console.error("Error searching notes by content:", error)
-      throw error
+      logger.error("Error searching notes by content:", error)
     }
 
     return data || []

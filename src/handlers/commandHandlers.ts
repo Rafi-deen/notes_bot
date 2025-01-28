@@ -2,6 +2,7 @@ import { Context } from "../types/index.js"
 import { noteService } from "../services/noteService.js"
 import { keyboards } from "../keyboards/keyboards.js"
 import { formatters } from "../utils/formatters.js"
+import { logger } from "@/utils/logger.js"
 
 export const commandHandlers = {
   async start(ctx: Context) {
@@ -19,18 +20,22 @@ Choose an option from the menu below:
   },
 
   async help(ctx: Context) {
+    // logger.info(`Help : ${ctx!.from!.id}`)
     await ctx.reply(formatters.formatHelpMessage(), keyboards.main())
   },
 
   async newNote(ctx: Context) {
+    logger.info(`create a new note for id : ${ctx!.from!.id}`)
+
     if (!("text" in ctx.message!)) {
+      logger.error("no note content")
       return
     }
 
     const input = ctx.message.text.slice(5).trim()
     if (!input) {
       return ctx.reply(
-        "Please provide content for your note.\nFormat: /new [title] | content #tags"
+        "Please provide content for your note.\nFormat: /new [note-content] #[tags]"
       )
     }
 
@@ -51,12 +56,17 @@ Choose an option from the menu below:
         })
         .join(" ")
 
-      // Split title and content if | is present
-      if (content.includes("|")) {
-        ;[title, content] = content.split("|").map((str) => str.trim())
-      }
-
-      await noteService.saveNote(ctx.from!.id, content, title, tags)
+      // // Split title and content if | is present
+      // if (content.includes("|")) {
+      //   ;[title, content] = content.split("|").map((str) => str.trim())
+      // }
+      const data = await noteService.saveNote(
+        ctx.from!.id,
+        content,
+        title,
+        tags
+      )
+      logger.info(`note created successfully, ${data}`)
       await ctx.reply("✅ Note saved successfully!", keyboards.main())
     } catch (error) {
       console.error("Error saving note:", error)
@@ -65,13 +75,16 @@ Choose an option from the menu below:
       )
     }
   },
-  
+
   async handleSearch(ctx: Context) {
+    logger.info("searching notes")
     if (!ctx.session.searchType) {
+    logger.error("need to select search type")
       return
     }
 
     if (!("text" in ctx.message!)) {
+      logger.warn("invalid search text")
       return
     }
 
@@ -86,6 +99,8 @@ Choose an option from the menu below:
           .map((tag) => tag.slice(1))
 
         if (tags.length === 0) {
+          logger.error(`no valid tags provided for search`);
+          
           return ctx.reply(
             "Please provide at least one valid tag starting with #"
           )
@@ -97,6 +112,7 @@ Choose an option from the menu below:
       }
 
       if (!notes || notes.length === 0) {
+        logger.info(`no notes found for search term: ${ctx!.message!.text}`)
         await ctx.reply(
           "No notes found matching your search.",
           keyboards.main()
@@ -106,11 +122,12 @@ Choose an option from the menu below:
           parse_mode: "Markdown",
           ...keyboards.main(),
         })
+        logger.info(`Notes found`)
       }
 
       ctx.session.searchType = undefined
     } catch (error) {
-      console.error("Error searching notes:", error)
+      logger.error("Error searching notes:", error)
       await ctx.reply(
         "Sorry, there was an error searching your notes. Please try again."
       )

@@ -20,18 +20,14 @@ Notes Bot Commands:
 • New Note - Create new note
 • List Notes - View all notes
 • Search Notes - Search your notes
-• Settings - Bot configuration
 
 Text Commands:
 /new <title> | <content> - Create note
 /list - View all notes
-/delete <id> - Delete note
-/pin <id> - Pin/unpin note
 /search <tags> - Search by tags
 
 Tips:
 - Add tags using # (e.g., #work #urgent)
-- Separate title and content with |
 - Pin important notes for quick access
     `;
   },

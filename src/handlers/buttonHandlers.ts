@@ -4,11 +4,12 @@ import { keyboards } from '../keyboards/keyboards.js';
 import { formatters } from '../utils/formatters.js';
 import { config } from '../config/config.js';
 import { commandHandlers } from './commandHandlers.js';
+import { logger } from '@/utils/logger.js';
 
 export const buttonHandlers = {
   async handleNewNote(ctx: Context) {
     await ctx.reply(
-      'Please enter your note in this format:\nTitle | Content #tags\n\nOr use the /new command.',
+      'Please enter your note in this format:\n/new [note-content] #[tags].',
       keyboards.backOnly()
     );
   },
@@ -23,6 +24,7 @@ export const buttonHandlers = {
       );
       
       if (notes.length === 0) {
+        logger.warn(`user $ctx!.from!.id}: no notes available`)
         return ctx.reply(
           'You don\'t have any notes yet. Create one using "New Note"!',
           keyboards.main()
@@ -41,7 +43,7 @@ export const buttonHandlers = {
         }
       );
     } catch (error) {
-      console.error('Error fetching notes:', error);
+      logger.error('Error fetching notes:', error);
       await ctx.reply('Sorry, there was an error fetching your notes. Please try again.');
     }
   },
@@ -56,6 +58,7 @@ export const buttonHandlers = {
       keyboards.backOnly()
     );
     ctx.session.searchType = 'tags';
+    logger.info("search type is tags")
   },
 
   async handleSearchByContent(ctx: Context) {
@@ -64,6 +67,7 @@ export const buttonHandlers = {
       keyboards.backOnly()
     );
     ctx.session.searchType = 'content';
+    logger.info("search type is content")
   },
 
   async handlePreviousPage(ctx: Context) {
